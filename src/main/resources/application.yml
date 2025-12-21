@@ -1,0 +1,9 @@
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    max-http-header-size: 8096
+
+db:
+  user: java_user
+  password: java_password
+  url: jdbc:postgresql://localhost:5432/currency_exchange
