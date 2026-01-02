@@ -1,89 +1,78 @@
 package currency.app.DAO;
 
-import currency.app.Configs.DBSetup;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import currency.app.Configs.DatabaseAdapter;
 import currency.app.entities.Currency;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+
 public class CurrencyDAO implements DAO<Currency> {
-
-    private final DBSetup db;
-
-    public CurrencyDAO(DBSetup dbSetup) {
-        this.db = dbSetup;  // 👉 зависимость извне
-    }
+    private final DatabaseAdapter dbAdapter = new DatabaseAdapter();
 
     @Override
-    public Optional<Currency> findById(int id) throws SQLException {
-
-        String query = "SELECT * FROM currencies WHERE id = ?";
-
-        Connection connection = db.getConnection();
-
-
-        PreparedStatement myStmt;
-        myStmt = connection.prepareStatement(query);
-        myStmt.setInt(1,id);
-        ResultSet myRs = myStmt.executeQuery();
-
-        while (myRs.next()) {
-
-//            myRs.next();
-            String fullName = myRs.getString("fullName");
-            String sign = myRs.getString("sign");
-            String code = myRs.getString("code");
-            int _id = myRs.getInt("id");
-
-
-            Currency currency = new Currency(fullName,sign,code,_id);
-            System.out.println(currency.toString());
-            return Optional.of(currency);
-
-
+    public Optional<Currency> findByCode(String code) {
+        try {
+            String[] columns = {"code", "fullName", "sign", "id"};
+            Object[] queryParams = {code};
+            String query = "SELECT * FROM currencies WHERE code = ?";
+            return dbAdapter.getEntity(query, columns, Currency.class, queryParams);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
-//        myRs.next();
-//        String fullName = myRs.getString("fullName");
-//        String sign = myRs.getString("sign");
-//        String code = myRs.getString("code");
-//        int _id = myRs.getInt("id");
-//
-//
-//        Currency currency = new Currency(fullName,sign,code,_id);
-
-//        while (myRs.next()) {
-//
-//            int id = myRs.getInt("id");
-//
-//
-//            int age = myRs.getInt("age");
-//
-//            // Process the retrieved data
-//
-//        }
-
         return Optional.empty();
     }
 
-//    @Override
-//    public Optional<Currency> findById(Integer id) throws SQLException {
-//        return Optional.empty();
-//    }
+    @Override
+    public List<Currency> findAll() {
+        try {
+            String[] columns = {"code", "fullName", "sign", "id"};
+            String query = "SELECT * FROM currencies";
+            return dbAdapter.getListEntities(query, columns, Currency.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
 
+    @Override
+    public Currency save(Currency entity) {
+        try {
+            Object[] queryParams = {entity.getCode(), entity.getFullName(), entity.getSign()};
+            String query = "INSERT INTO public.currencies(\n" +
+                    "\tcode, fullname, sign)\n" +
+                    "\tVALUES (?, ?, ?) RETURNING id;";
+            int id = dbAdapter.executeWithReturningId(query, queryParams);
+            entity.setId(id);
+            return entity;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-//    @Override
-//    public List<Currency> getAll(String id) {
-//        return List.of();
-//    }
-//
-//    @Override
-//    public int add(Currency entity) {
-//        return 0;
-//    }
+    @Override
+    public Currency update(Currency entity) {
+        return null;
+    }
+
+    @Override
+    public void delete(String id) {
+
+    }
+
+    @Override
+    public Optional<Currency> findById(int id) {
+
+        try {
+            String[] columns = {"code", "fullName", "sign", "id"};
+            Object[] queryParams = {id};
+            String query = "SELECT * FROM currencies WHERE id = ?";
+            return dbAdapter.getEntity(query, columns, Currency.class, queryParams);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
 }
