@@ -1,12 +1,19 @@
 package currency.app.entities;
 
 public class Currency {
-    public int id;
-    public String fullName;
-    public String sign;
-    public String code;
+    private int id;
+    private String fullName;
+    private String sign;
+    private String code;
 
     public Currency(String fullName, String sign, String code, int id) {
+        this.fullName = fullName;
+        this.sign = sign;
+        this.code = code;
+        this.id = id;
+    }
+
+    public Currency(String fullName, String sign, String code) {
         this.fullName = fullName;
         this.sign = sign;
         this.code = code;
@@ -55,3 +62,33 @@ public class Currency {
                 '}';
     }
 }
+
+
+//package currency.app.entities;
+//
+//import lombok.Data;
+//
+//@Data
+//public class Currency {
+//    public int id;
+//    public String fullName;
+//    public String sign;
+//    public String code;
+//
+//    public Currency(String fullName, String sign, String code, int id) {
+//        this.fullName = fullName;
+//        this.sign = sign;
+//        this.code = code;
+//        this.id = id;
+//    }
+//
+//    @Override
+//    public String toString() {
+//        return "Currency{" +
+//                "id=" + id +
+//                ", fullName='" + fullName + '\'' +
+//                ", sign='" + sign + '\'' +
+//                ", code='" + code + '\'' +
+//                '}';
+//    }
+//}
