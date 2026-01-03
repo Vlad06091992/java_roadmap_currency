@@ -3,6 +3,7 @@ package currency.app.DAO;
 import currency.app.Configs.DatabaseAdapter;
 import currency.app.entities.Currency;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +54,12 @@ public class CurrencyDAO implements DAO<Currency> {
     }
 
     @Override
-    public Currency update(Currency entity) {
+    public Optional<Currency> create(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Currency> update(Currency entity) {
         return null;
     }
 

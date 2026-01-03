@@ -8,7 +8,7 @@ public class ExchangeRate {
     private Currency targetCurrency;
     private BigDecimal rate;
 
-    public ExchangeRate(int id, Currency baseCurrency, Currency targetCurrency, BigDecimal rate) {
+    public ExchangeRate(Currency baseCurrency, Currency targetCurrency, BigDecimal rate,int id) {
         this.id = id;
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;

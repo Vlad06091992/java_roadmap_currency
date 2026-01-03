@@ -17,7 +17,6 @@ public class Currency {
         this.fullName = fullName;
         this.sign = sign;
         this.code = code;
-        this.id = id;
     }
 
     public int getId() {

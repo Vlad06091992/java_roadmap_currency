@@ -1,5 +1,7 @@
 package currency.app.Configs;
 
+import currency.app.DAO.QUERY_MODES;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
@@ -48,33 +50,46 @@ public class DatabaseAdapter {
     }
 
 
-    public Map<String, Object> executeRaw(String query, String[] columns, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Map<String, Object> map = new HashMap<>();
-        String stringQuery = String.join(", ",columns);
-       String newQuery = query.replace("*", stringQuery);
+    public Map<String, Object> executeRaw(String query, String[] columns, QUERY_MODES mode, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
-        //TODO 'PreparedStatement' used without 'try'-with-resources statement
-        PreparedStatement myStmt = preparedStatement(newQuery);
+        try {
+            Map<String, Object> map = new HashMap<>();
+            String stringQuery = String.join(", ", columns);
+            String newQuery = query.replace("*", stringQuery);
 
-        for (int i = 0; i < queryParams.length; i++) {
-            int index = i + 1;
-            myStmt.setObject(index, queryParams[i]);
-        }
+            //TODO 'PreparedStatement' used without 'try'-with-resources statement
+            PreparedStatement myStmt = preparedStatement(newQuery);
 
-        ResultSet myRs = myStmt.executeQuery();
-
-        while (myRs.next()) {
-            for (String column : columns) {
-                Object result = myRs.getObject(column);
-                map.put(column, result);
-
+            for (int i = 0; i < queryParams.length; i++) {
+                int index = i + 1;
+                myStmt.setObject(index, queryParams[i]);
             }
-        }
 
-        return map;
+            if(mode == QUERY_MODES.UPDATE) {
+                int myRs = myStmt.executeUpdate();
+                map.put("updated", myRs);
+                return map;
+            }
+
+            ResultSet myRs = myStmt.executeQuery();
+
+
+            while (myRs.next()) {
+                for (String column : columns) {
+                    Object result = myRs.getObject(column);
+                    map.put(column, result);
+
+                }
+            }
+
+            return map;
+        } catch (Exception e) {
+            return new HashMap<>();
+        }
     }
 
-    public <T> List<T> getListEntities(String query, String[] columns, Class<T> clazz, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public <T> List<T> getListEntities(String query, String[] columns, Class<T> clazz, Object... queryParams) throws
+            SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         List<T> list = new ArrayList<>();
         List<Map<String, Object>> maps = new ArrayList<>();
@@ -109,7 +124,8 @@ public class DatabaseAdapter {
     }
 
 
-    public int executeWithReturningId(String query, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public int executeWithReturningId(String query, Object... queryParams) throws
+            SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         int id = 0;
 
