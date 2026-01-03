@@ -4,6 +4,7 @@ import currency.app.Configs.DatabaseAdapter;
 import currency.app.entities.Currency;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,8 +39,7 @@ public class CurrencyDAO implements DAO<Currency> {
     }
 
     @Override
-    public Currency save(Currency entity) {
-        try {
+    public Currency save(Currency entity) throws SQLException {
             Object[] queryParams = {entity.getCode(), entity.getFullName(), entity.getSign()};
             String query = "INSERT INTO public.currencies(\n" +
                     "\tcode, fullname, sign)\n" +
@@ -47,25 +47,11 @@ public class CurrencyDAO implements DAO<Currency> {
             int id = dbAdapter.executeWithReturningId(query, queryParams);
             entity.setId(id);
             return entity;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public Optional<Currency> create(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
-        return Optional.empty();
     }
 
     @Override
     public Optional<Currency> update(Currency entity) {
         return null;
-    }
-
-    @Override
-    public void delete(String id) {
-
     }
 
     @Override

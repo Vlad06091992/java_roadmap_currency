@@ -125,7 +125,7 @@ public class DatabaseAdapter {
 
 
     public int executeWithReturningId(String query, Object... queryParams) throws
-            SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+            SQLException {
 
         int id = 0;
 

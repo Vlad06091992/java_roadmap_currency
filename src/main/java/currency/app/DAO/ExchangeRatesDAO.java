@@ -5,6 +5,7 @@ import currency.app.entities.Currency;
 import currency.app.entities.ExchangeRate;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -77,7 +78,6 @@ public class ExchangeRatesDAO implements DAO<ExchangeRate> {
         return Optional.empty();
     }
 
-    @Override
     public Optional<ExchangeRate> create(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         try {
 
@@ -85,16 +85,11 @@ public class ExchangeRatesDAO implements DAO<ExchangeRate> {
             Optional<Currency> targetCurrency = currencyDAO.findByCode(targetCurrencyCode);
 
             if (baseCurrency.isPresent() && targetCurrency.isPresent()) {
-                Object[] queryParams = {baseCurrency.get().getId(), targetCurrency.get().getId(), rate};
-                String query = "INSERT INTO public.exchange_rates(\n" +
-                        "\t base_currency_id, target_currency_id, rate)\n" +
-                        "\tVALUES (?, ? ,? ) RETURNING id;";
-                int id = dbAdapter.executeWithReturningId(query, queryParams);
-
-                ExchangeRate exchangeRate = new ExchangeRate(baseCurrency.get(), targetCurrency.get(), rate, id);
-                return Optional.of(exchangeRate);
+                ExchangeRate exchangeRate = new ExchangeRate(baseCurrency.get(), targetCurrency.get(), rate);
+                ExchangeRate res = save(exchangeRate);
+                return Optional.of(res);
             } else {
-              return Optional.empty();
+                return Optional.empty();
             }
 
         } catch (Exception e) {
@@ -123,45 +118,6 @@ public class ExchangeRatesDAO implements DAO<ExchangeRate> {
 
     }
 
-//    @Override
-//    public List<Currency> findAll() {
-//        try {
-//            String[] columns = {"code", "fullName", "sign", "id"};
-//            String query = "SELECT * FROM currencies";
-//            return db.executeAll(query, columns, Currency.class);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return new ArrayList<>();
-//    }
-
-//    @Override
-//    public ExchangeRate save(ExchangeRate entity) {
-//        try {
-//            Object[] queryParams = {entity.getCode(), entity.getFullName(), entity.sign};
-//            String query = "INSERT INTO public.currencies(\n" +
-//                    "\tcode, fullname, sign)\n" +
-//                    "\tVALUES (?, ?, ?) RETURNING id;";
-//            int id = db.executeForSave(query, queryParams);
-//            entity.setId(id);
-//            return entity;
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
-//    @Override
-//    public Currency update(Currency entity) {
-//        return null;
-//    }
-
-    @Override
-    public void delete(String id) {
-
-    }
-
-
     @Override
     public List<ExchangeRate> findAll() {
         return List.of();
@@ -173,7 +129,13 @@ public class ExchangeRatesDAO implements DAO<ExchangeRate> {
     }
 
     @Override
-    public ExchangeRate save(ExchangeRate entity) {
-        return null;
+    public ExchangeRate save(ExchangeRate entity) throws SQLException {
+        Object[] queryParams = {entity.getBaseCurrency().getId(), entity.getTargetCurrency().getId(), entity.getRate()};
+        String query = "INSERT INTO public.exchange_rates(\n" +
+                "\t base_currency_id, target_currency_id, rate)\n" +
+                "\tVALUES (?, ? ,? ) RETURNING id;";
+        int id = dbAdapter.executeWithReturningId(query, queryParams);
+        entity.setId(id);
+        return entity;
     }
 }

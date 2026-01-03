@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -48,6 +49,14 @@ public class CurrenciesServlet extends HttpServlet {
             String code = params.get("code");
             String sign = params.get("sign");
 
+            for (String field : new String[]{code, sign, name}) {
+                if(field == null || field.isEmpty()) continue; {
+                    out.print("need required fields: name,code,sign");
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+            }
+
             Optional<Currency> currency = currencyDAO.findByCode(code);
             if (currency.isPresent()) {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
@@ -61,7 +70,9 @@ public class CurrenciesServlet extends HttpServlet {
             out.print(currencyJsonString);
 
         } catch (IOException ex) {
-            request.setAttribute("message", "There was an error: " + ex.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
         }
     }
 
