@@ -1,7 +1,11 @@
 package currency.app.Configs;
 
 import currency.app.DAO.QUERY_MODES;
+import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
@@ -10,11 +14,26 @@ import java.util.*;
 public class DatabaseAdapter {
     public PreparedStatement preparedStatement(String query) throws java.sql.SQLException {
         try {
+            String mode = System.getenv("mode");
+            Dotenv dotenv = mode.equals("production") ? Dotenv.configure().directory("./").filename(".env.prod").load() : Dotenv.load();
             Class.forName("org.postgresql.Driver");
-            String name = "java_user";
-            String pass = "java_password";
-            String url = "jdbc:postgresql://localhost:5432/currency_exchange";
-            Connection connection = DriverManager.getConnection(url, name, pass); // Establishes the connection to the database
+
+            String url = dotenv.get("DB_URL");
+            String user = dotenv.get("DB_USER");
+            String password = dotenv.get("DB_PASSWORD");
+
+            Properties props = new Properties();
+            props.setProperty("user", user);
+            props.setProperty("password", password);
+
+            if (mode.equals("production")) {
+                props.setProperty("sslmode", dotenv.get("DB_SSL_MODE"));
+                props.setProperty("channel_binding", dotenv.get("DB_CHANNEL_BINDING"));
+            }
+
+
+
+            Connection connection = DriverManager.getConnection(url, props);
             return connection.prepareStatement(query);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -65,7 +84,7 @@ public class DatabaseAdapter {
                 myStmt.setObject(index, queryParams[i]);
             }
 
-            if(mode == QUERY_MODES.UPDATE) {
+            if (mode == QUERY_MODES.UPDATE) {
                 int myRs = myStmt.executeUpdate();
                 map.put("updated", myRs);
                 return map;
