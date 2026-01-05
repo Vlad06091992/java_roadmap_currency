@@ -1,13 +1,16 @@
 package currency.app.Configs;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -42,5 +45,22 @@ public class Utils {
             }
         }
         return params;
+    }
+
+    public Map<String, String> parseQueryParams(HttpServletRequest request, HttpServletResponse response, String[] params) throws IOException {
+        String[] queryParams = request
+            .getQueryString()
+            .split("&");
+        Map<String,String> mapParams = Arrays.stream(queryParams)
+                .map(string -> string.split("="))
+                .collect(Collectors.toMap((str)-> str[0], (str)-> str[1]));
+
+
+        for(String param : params) {
+            if(!mapParams.containsKey(param)){
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return null;
+            }        }
+        return mapParams;
     }
 }

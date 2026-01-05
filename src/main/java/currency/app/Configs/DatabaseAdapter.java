@@ -11,10 +11,10 @@ public class DatabaseAdapter {
     public PreparedStatement preparedStatement(String query) throws java.sql.SQLException {
         try {
             Class.forName("org.postgresql.Driver");
-            String uname = "java_user";
+            String name = "java_user";
             String pass = "java_password";
             String url = "jdbc:postgresql://localhost:5432/currency_exchange";
-            Connection connection = DriverManager.getConnection(url, uname, pass); // Establishes the connection to the database
+            Connection connection = DriverManager.getConnection(url, name, pass); // Establishes the connection to the database
             return connection.prepareStatement(query);
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);

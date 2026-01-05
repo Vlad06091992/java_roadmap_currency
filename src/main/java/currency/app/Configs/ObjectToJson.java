@@ -1,13 +1,32 @@
 package currency.app.Configs;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ObjectToJson {
     public static <T> String getSimpleJson(T t) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(t);
+    }
+
+
+    public static <T> String getSimpleJsonWithoutId(T t) {
+        Gson gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+                return Objects.equals(fieldAttributes.getName(), "id");
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> aClass) {
+                return false;
+            }
+        }).setPrettyPrinting().create();
         return gson.toJson(t);
     }
 
