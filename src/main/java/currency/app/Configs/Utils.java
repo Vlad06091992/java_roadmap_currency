@@ -10,9 +10,12 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 public class Utils {
+
+    Properties prop = new Properties();
 
     public Map<String, String> parseFormData(HttpServletRequest request) throws IOException {
 
