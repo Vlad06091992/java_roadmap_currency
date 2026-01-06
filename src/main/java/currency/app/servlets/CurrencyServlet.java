@@ -1,6 +1,6 @@
 package currency.app.servlets;
 
-import currency.app.Configs.ObjectToJson;
+import currency.app.Utilites.JSONUtils;
 import currency.app.DAO.CurrencyDAO;
 import currency.app.entities.Currency;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
-    public ObjectToJson objectToJson;
+    public JSONUtils JSONUtils;
     private final CurrencyDAO currencyDAO = new CurrencyDAO();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +31,7 @@ public class CurrencyServlet extends HttpServlet {
             }
 
             System.out.println(currency);
-            String currencyJsonString = ObjectToJson.getSimpleJson(currency.get());
+            String currencyJsonString = JSONUtils.getSimpleJson(currency.get());
             PrintWriter out = response.getWriter();
             out.print(currencyJsonString);
             out.flush();

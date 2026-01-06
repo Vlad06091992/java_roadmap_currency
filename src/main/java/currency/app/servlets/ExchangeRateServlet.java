@@ -1,7 +1,7 @@
 package currency.app.servlets;
 
-import currency.app.Configs.ObjectToJson;
-import currency.app.Configs.Utils;
+import currency.app.Utilites.JSONUtils;
+import currency.app.Utilites.Utils;
 import currency.app.DAO.ExchangeRatesDAO;
 import currency.app.entities.ExchangeRate;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,14 +12,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Currency;
 import java.util.Map;
 import java.util.Optional;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
-    public ObjectToJson objectToJson;
+    public JSONUtils JSONUtils;
     private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
     private final Utils utils = new Utils();
 
@@ -39,7 +37,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
             Optional<ExchangeRate> exchangeRate = exchangeRatesDAO.findByCodes(from, to);
             if (exchangeRate.isPresent()) {
-                String currencyJsonString = ObjectToJson.getSimpleJson(exchangeRate.get());
+                String currencyJsonString = JSONUtils.getSimpleJson(exchangeRate.get());
                 out.print(currencyJsonString);
             } else {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -80,7 +78,7 @@ public class ExchangeRateServlet extends HttpServlet {
                 Optional<ExchangeRate> newExchangeRate = exchangeRatesDAO.create(baseCurrencyCode, targetCurrencyCode, rateValue);
 
                 if (newExchangeRate.isPresent()) {
-                    String currencyJsonString = ObjectToJson.getSimpleJson(newExchangeRate);
+                    String currencyJsonString = JSONUtils.getSimpleJson(newExchangeRate);
                     out.print(currencyJsonString);
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -127,7 +125,7 @@ public class ExchangeRateServlet extends HttpServlet {
                 exchangeRate.get().setRate(BigDecimal.valueOf(Double.parseDouble(rate)));
                 Optional<ExchangeRate> res = exchangeRatesDAO.update(exchangeRate.get());
                 if (res.isPresent()) {
-                    String currencyJsonString = ObjectToJson.getSimpleJson(exchangeRate.get());
+                    String currencyJsonString = JSONUtils.getSimpleJson(exchangeRate.get());
                     out.print(currencyJsonString);
                 }
             } else {

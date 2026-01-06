@@ -1,11 +1,7 @@
-package currency.app.Configs;
+package currency.app.DAO;
 
-import currency.app.DAO.QUERY_MODES;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
@@ -15,7 +11,6 @@ public class DatabaseAdapter {
     public PreparedStatement preparedStatement(String query) throws java.sql.SQLException {
         try {
             String mode = System.getenv("mode");
-            System.out.println("MODE!: " + mode);
             Dotenv dotenv = mode.equals("production") ? Dotenv.configure().directory("./").filename(".env.prod").load() : Dotenv.load();
             Class.forName("org.postgresql.Driver");
 

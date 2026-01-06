@@ -1,4 +1,4 @@
-package currency.app.Configs;
+package currency.app.Utilites;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -8,7 +8,7 @@ import com.google.gson.GsonBuilder;
 import java.util.List;
 import java.util.Objects;
 
-public class ObjectToJson {
+public class JSONUtils {
     public static <T> String getSimpleJson(T t) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(t);

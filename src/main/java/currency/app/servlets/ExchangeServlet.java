@@ -1,7 +1,7 @@
 package currency.app.servlets;
 
-import currency.app.Configs.ObjectToJson;
-import currency.app.Configs.Utils;
+import currency.app.Utilites.JSONUtils;
+import currency.app.Utilites.Utils;
 import currency.app.DAO.ExchangeRatesDAO;
 import currency.app.entities.Currency;
 import currency.app.entities.Exchange;
@@ -20,7 +20,7 @@ import java.util.Optional;
 
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
-    public ObjectToJson objectToJson;
+    public JSONUtils JSONUtils;
     private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
     private final Utils utils = new Utils();
     private final BigDecimal hundred = BigDecimal.valueOf(100);
@@ -58,7 +58,7 @@ public class ExchangeServlet extends HttpServlet {
 
             if (exchangeRate.isPresent()) {
                 Exchange exchange = new Exchange(exchangeRate.get().getBaseCurrency(), exchangeRate.get().getTargetCurrency(), exchangeRate.get().getRate(), amountValue);
-                String currencyJsonString = ObjectToJson.getSimpleJsonWithoutId(exchange);
+                String currencyJsonString = JSONUtils.getSimpleJsonWithoutId(exchange);
                 out.print(currencyJsonString);
             } else {
                 Optional<ExchangeRate> usdFrom = exchangeRatesDAO.findByCodes("USD", from);
@@ -76,7 +76,7 @@ public class ExchangeServlet extends HttpServlet {
 
                 BigDecimal resultRate = usdToRate.divide(usdFromRate, 7, RoundingMode.HALF_UP);
                 Exchange exchange = new Exchange(usdFrom.get().getTargetCurrency(), usdTo.get().getTargetCurrency(), resultRate, amountValue);
-                String currencyJsonString = ObjectToJson.getSimpleJsonWithoutId(exchange);
+                String currencyJsonString = JSONUtils.getSimpleJsonWithoutId(exchange);
                 out.print(currencyJsonString);
             }
 
@@ -115,7 +115,7 @@ public class ExchangeServlet extends HttpServlet {
                 Optional<ExchangeRate> newExchangeRate = exchangeRatesDAO.create(baseCurrencyCode, targetCurrencyCode, rateValue);
 
                 if (newExchangeRate.isPresent()) {
-                    String currencyJsonString = ObjectToJson.getSimpleJson(newExchangeRate);
+                    String currencyJsonString = JSONUtils.getSimpleJson(newExchangeRate);
                     out.print(currencyJsonString);
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -162,7 +162,7 @@ public class ExchangeServlet extends HttpServlet {
                 exchangeRate.get().setRate(BigDecimal.valueOf(Double.parseDouble(rate)));
                 Optional<ExchangeRate> res = exchangeRatesDAO.update(exchangeRate.get());
                 if (res.isPresent()) {
-                    String currencyJsonString = ObjectToJson.getSimpleJson(exchangeRate.get());
+                    String currencyJsonString = JSONUtils.getSimpleJson(exchangeRate.get());
                     out.print(currencyJsonString);
                 }
             } else {

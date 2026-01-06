@@ -1,9 +1,7 @@
 package currency.app.DAO;
 
-import currency.app.Configs.DatabaseAdapter;
 import currency.app.entities.Currency;
 
-import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;

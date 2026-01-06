@@ -1,4 +1,4 @@
-package currency.app.Configs;
+package currency.app.filters;
 
 
 import jakarta.servlet.*;

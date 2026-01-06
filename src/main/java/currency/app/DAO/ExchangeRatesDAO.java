@@ -1,6 +1,5 @@
 package currency.app.DAO;
 
-import currency.app.Configs.DatabaseAdapter;
 import currency.app.entities.Currency;
 import currency.app.entities.ExchangeRate;
 
