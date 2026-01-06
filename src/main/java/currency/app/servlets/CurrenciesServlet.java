@@ -50,7 +50,7 @@ public class CurrenciesServlet extends HttpServlet {
             String sign = params.get("sign");
 
             for (String field : new String[]{code, sign, name}) {
-                if(field == null || field.isEmpty()) continue; {
+                if(field == null || field.isEmpty()) {
                     out.print("need required fields: name,code,sign");
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
