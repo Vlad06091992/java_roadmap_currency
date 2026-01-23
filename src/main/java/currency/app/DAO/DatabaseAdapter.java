@@ -1,5 +1,6 @@
 package currency.app.DAO;
 
+import currency.app.entities.annotations.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.lang.reflect.Constructor;
@@ -8,10 +9,11 @@ import java.sql.*;
 import java.util.*;
 
 public class DatabaseAdapter {
-    public PreparedStatement preparedStatement(String query) throws java.sql.SQLException {
+    public PreparedStatement preparedStatement(String query) throws SQLException {
         try {
             String mode = System.getenv("mode");
-            Dotenv dotenv = mode.equals("production") ? Dotenv.configure().directory("./").filename(".env.prod").load() : Dotenv.load();
+            Dotenv dotenv = Dotenv.load();
+//            Dotenv dotenv = mode.equals("production") ? Dotenv.configure().directory("./").filename(".env.prod").load() : Dotenv.load();
             Class.forName("org.postgresql.Driver");
 
             String url = dotenv.get("DB_URL");
@@ -22,11 +24,10 @@ public class DatabaseAdapter {
             props.setProperty("user", user);
             props.setProperty("password", password);
 
-            if (mode.equals("production")) {
-                props.setProperty("sslmode", dotenv.get("DB_SSL_MODE"));
-                props.setProperty("channel_binding", dotenv.get("DB_CHANNEL_BINDING"));
-            }
-
+//            if (mode.equals("production")) {
+//                props.setProperty("sslmode", dotenv.get("DB_SSL_MODE"));
+//                props.setProperty("channel_binding", dotenv.get("DB_CHANNEL_BINDING"));
+//            }
 
 
             Connection connection = DriverManager.getConnection(url, props);
@@ -37,16 +38,22 @@ public class DatabaseAdapter {
     }
 
     // принимает     возвращет -- дженерики
-    public <T> Optional<T> getEntity(String query, String[] columns, Class<T> clazz, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public <T> Optional<T> getEntityByParam(Class<T> clazz, String paramName, Object param) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        String query = "";
 
-        //TODO 'PreparedStatement' used without 'try'-with-resources statement
-        PreparedStatement myStmt = preparedStatement(query);
-
-        for (int i = 0; i < queryParams.length; i++) {
-            int index = i + 1;
-            myStmt.setObject(index, queryParams[i]);
+        if (paramName.equals("id")) {
+            query = clazz.getAnnotation(FindByIdQuery.class).query();
         }
 
+        if (paramName.equals("code")) {
+            query = clazz.getAnnotation(FindByCodeQuery.class).query();
+        }
+
+        String[] columns = clazz.getAnnotation(Columns.class).columns();
+        PreparedStatement myStmt = preparedStatement(query);
+
+
+        myStmt.setObject(1, param);
         ResultSet myRs = myStmt.executeQuery();
         Map<String, Object> map = new HashMap<>();
 
@@ -59,15 +66,28 @@ public class DatabaseAdapter {
         }
 
         Constructor<?>[] constructors = clazz.getConstructors();
-        Constructor<T> constructor = (Constructor<T>) constructors[0];
+
+        Constructor<?> constructor = null;
+
+        for (Constructor<?> c : constructors) {
+            if (c.getParameterCount() == columns.length) {
+                constructor = c;
+            }
+        }
+
         Object[] array = map.values().toArray();
-        return Optional.of(constructor.newInstance(array));
+        if (constructor != null) {
+            return (Optional<T>) Optional.of(constructor.newInstance(array));
+
+        }
+        return Optional.empty();
     }
 
 
-    public Map<String, Object> executeRaw(String query, String[] columns, QUERY_MODES mode, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public Map<String, Object> executeRaw(String query, String[] columns, Object... queryParams) throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         try {
+            String mode = query.split(" ")[0];
             Map<String, Object> map = new HashMap<>();
             String stringQuery = String.join(", ", columns);
             String newQuery = query.replace("*", stringQuery);
@@ -80,7 +100,7 @@ public class DatabaseAdapter {
                 myStmt.setObject(index, queryParams[i]);
             }
 
-            if (mode == QUERY_MODES.UPDATE) {
+            if (mode.equals(QUERY_MODES.UPDATE.toString())) {
                 int myRs = myStmt.executeUpdate();
                 map.put("updated", myRs);
                 return map;
@@ -103,8 +123,12 @@ public class DatabaseAdapter {
         }
     }
 
-    public <T> List<T> getListEntities(String query, String[] columns, Class<T> clazz, Object... queryParams) throws
-            SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public <T> List<T> getListEntities(Class<T> clazz) throws
+            SQLException, InstantiationException, IllegalAccessException, InvocationTargetException {
+
+
+        String query = clazz.getAnnotation(FindAllQuery.class).query();
+        String[] columns = clazz.getAnnotation(Columns.class).columns();
 
         List<T> list = new ArrayList<>();
         List<Map<String, Object>> maps = new ArrayList<>();
@@ -112,14 +136,9 @@ public class DatabaseAdapter {
         //TODO 'PreparedStatement' used without 'try'-with-resources statement
         PreparedStatement myStmt = preparedStatement(query);
 
-        for (int i = 0; i < queryParams.length; i++) {
-            int index = i + 1;
-            myStmt.setObject(index, queryParams[i]);
-        }
-
         ResultSet myRs = myStmt.executeQuery();
         while (myRs.next()) {
-            Map<String, Object> map = new HashMap<>();
+            Map<String, Object> map = new LinkedHashMap<>();
             for (String column : columns) {
                 Object result = myRs.getObject(column);
                 map.put(column, result);
@@ -130,18 +149,30 @@ public class DatabaseAdapter {
 
         for (Map<String, Object> map : maps) {
             Constructor<?>[] constructors = clazz.getConstructors();
-            Constructor<T> constructor = (Constructor<T>) constructors[0];
+
+            Constructor<?> constructor = null;
+
+            for (Constructor<?> c : constructors) {
+                if (c.getParameterCount() == columns.length) {
+                    constructor = c;
+                }
+            }
+
             Object[] array = map.values().toArray();
-            list.add(constructor.newInstance(array));
+            if (constructor != null) {
+                list.add((T) constructor.newInstance(array));
+
+            }
         }
 
         return list;
     }
 
 
-    public int executeWithReturningId(String query, Object... queryParams) throws
+    public <T> int saveAndReturnId(Class<T> clazz, Object[] queryParams) throws
             SQLException {
 
+        String query = clazz.getAnnotation(InsertWithReturningIdQuery.class).query();
         int id = 0;
 
         PreparedStatement myStmt = preparedStatement(query);
@@ -155,7 +186,6 @@ public class DatabaseAdapter {
             int result = myRs.getInt("id");
             id = result;
         }
-
         return id;
     }
 }

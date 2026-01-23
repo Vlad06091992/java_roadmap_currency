@@ -4,6 +4,7 @@ import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
 import currency.app.DAO.ExchangeRatesDAO;
 import currency.app.entities.ExchangeRate;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
-    public JSONUtils JSONUtils;
+    public JSONUtils jsonUtils;
     private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
     private final Utils utils = new Utils();
 
@@ -49,48 +50,16 @@ public class ExchangeRateServlet extends HttpServlet {
         }
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        PrintWriter out = response.getWriter();
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-        try {
-            Map<String, String> params = utils.parseFormData(request);
-            String baseCurrencyCode = params.get("baseCurrencyCode");
-            String targetCurrencyCode = params.get("targetCurrencyCode");
-            String rate = params.get("rate");
-            for (String param : new String[]{baseCurrencyCode, targetCurrencyCode, rate}) {
-                if (params.isEmpty() || param == null) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-            }
-
-
-            response.setStatus(HttpServletResponse.SC_CREATED);
-
-            Optional<ExchangeRate> exchangeRate = exchangeRatesDAO.findByCodes(baseCurrencyCode, targetCurrencyCode);
-            if (exchangeRate.isPresent()) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                out.print("already exist");
-
-            } else {
-                BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
-                Optional<ExchangeRate> newExchangeRate = exchangeRatesDAO.create(baseCurrencyCode, targetCurrencyCode, rateValue);
-
-                if (newExchangeRate.isPresent()) {
-                    String currencyJsonString = JSONUtils.getSimpleJson(newExchangeRate);
-                    out.print(currencyJsonString);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                }
-            }
-
-        } catch (Exception ex) {
-            if (ex instanceof NumberFormatException) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            } else {
-                response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-            }
+        // Check if the request method is PATCH
+        if (req.getMethod().equalsIgnoreCase("PATCH")) {
+            doPatch(req, resp);
+        } else {
+            // For other methods (GET, POST, PUT, DELETE), delegate to the superclass
+            super.service(req, resp);
         }
     }
 

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    public JSONUtils JSONUtils;
+    public JSONUtils jsonUtils;
     private final CurrencyDAO currencyDAO = new CurrencyDAO();
     private final Utils utils = new Utils();
 

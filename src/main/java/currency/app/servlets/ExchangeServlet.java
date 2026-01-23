@@ -158,7 +158,6 @@ public class ExchangeServlet extends HttpServlet {
 
             Optional<ExchangeRate> exchangeRate = exchangeRatesDAO.findByCodes(from, to);
             if (exchangeRate.isPresent()) {
-                //делаем update
                 exchangeRate.get().setRate(BigDecimal.valueOf(Double.parseDouble(rate)));
                 Optional<ExchangeRate> res = exchangeRatesDAO.update(exchangeRate.get());
                 if (res.isPresent()) {
