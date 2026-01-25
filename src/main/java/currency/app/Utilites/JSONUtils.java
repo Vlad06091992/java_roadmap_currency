@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Objects;
 
+//TODO - наверное лучше сделать не статичесим
 public class JSONUtils {
 
    public static Utils utils = new Utils();
