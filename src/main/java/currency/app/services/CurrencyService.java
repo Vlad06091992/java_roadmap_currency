@@ -2,11 +2,13 @@ package currency.app.services;
 
 import currency.app.DAO.CurrencyDAO;
 import currency.app.Exceptions.IsExistException;
+import currency.app.Exceptions.NotFoundException;
 import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.entities.Currency;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +20,17 @@ public class CurrencyService {
         return JSONUtils.getSimpleJson(currencies);
     }
 
-    public String createCurrency(String name,String code,String sign) throws SQLException,IsExistException{
+    public String getCurrencyByCode(String code) throws NotFoundException {
+        Optional<Currency> currency = currencyDAO.findByCode(code);
 
+        if (currency.isEmpty()) {
+           throw new NotFoundException("currency not found");
+        }
+
+        return JSONUtils.getSimpleJson(currency.get());
+    }
+
+    public String createCurrency(String name,String code,String sign) throws SQLException,IsExistException{
         for (String field : new String[]{code, sign, name}) {
             if (field == null || field.isEmpty()) {
                 throw new NotValidDataException("Need required fields: name, code, sign");

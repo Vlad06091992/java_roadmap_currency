@@ -1,12 +1,9 @@
 package currency.app.servlets;
 
-import currency.app.DAO.ErrorDTO;
 import currency.app.Exceptions.IsExistException;
 import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
-import currency.app.DAO.CurrencyDAO;
-import currency.app.entities.Currency;
 import currency.app.services.CurrencyService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,9 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {

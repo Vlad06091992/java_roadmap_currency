@@ -15,9 +15,8 @@ public class CurrencyDAO implements DAO<Currency> {
         try {
             return dbAdapter.getEntityByParam(Currency.class, "code",code);
         } catch (Exception e) {
-            e.printStackTrace();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     @Override
