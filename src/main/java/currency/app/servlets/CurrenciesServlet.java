@@ -17,7 +17,6 @@ import java.util.Map;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    public JSONUtils jsonUtils;
     private final Utils utils = new Utils();
     private final CurrencyService currencyService = new CurrencyService();
 
@@ -55,7 +54,6 @@ public class CurrenciesServlet extends HttpServlet {
         } catch (IsExistException | NotValidDataException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             JSONUtils.printError(out, e.getMessage());
-
         }
     }
 }
