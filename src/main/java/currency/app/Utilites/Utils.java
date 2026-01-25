@@ -1,5 +1,6 @@
 package currency.app.Utilites;
 
+import currency.app.DAO.ErrorDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -60,5 +61,9 @@ public class Utils {
                 return null;
             }        }
         return mapParams;
+    }
+
+    public ErrorDTO getError(String message){
+        return new ErrorDTO(message);
     }
 }

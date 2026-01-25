@@ -1,9 +1,13 @@
 package currency.app.servlets;
 
+import currency.app.DAO.ErrorDTO;
+import currency.app.Exceptions.IsExistException;
+import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
 import currency.app.DAO.CurrencyDAO;
 import currency.app.entities.Currency;
+import currency.app.services.CurrencyService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,22 +23,19 @@ import java.util.Optional;
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
     public JSONUtils jsonUtils;
-    private final CurrencyDAO currencyDAO = new CurrencyDAO();
     private final Utils utils = new Utils();
+    private final CurrencyService currencyService = new CurrencyService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-
-
+        PrintWriter out = response.getWriter();
         try {
-            List<Currency> currencies = currencyDAO.findAll();
-            String currencyJsonString = JSONUtils.getSimpleJson(currencies);
-            PrintWriter out = response.getWriter();
+            String currencyJsonString = currencyService.getAllCurrenciesStringResponse();
             out.print(currencyJsonString);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONUtils.printError(out, "Server error");
         }
     }
 
@@ -48,35 +49,18 @@ public class CurrenciesServlet extends HttpServlet {
             String name = params.get("name");
             String code = params.get("code");
             String sign = params.get("sign");
-
-            for (String field : new String[]{code, sign, name}) {
-                if(field == null || field.isEmpty()) {
-                    out.print("need required fields: name,code,sign");
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-            }
-
-            Optional<Currency> currency = currencyDAO.findByCode(code);
-            if (currency.isPresent()) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                out.print("error: currency already exists");
-                return;
-            }
-
-            Currency newCurrency = new Currency(name,code,sign);
-            Currency createdCurrency = currencyDAO.save(newCurrency);
-            String currencyJsonString = JSONUtils.getSimpleJson(createdCurrency);
-            out.print(currencyJsonString);
-
+            String currency = currencyService.createCurrency(name, code, sign);
+            out.print(currency);
         } catch (IOException ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONUtils.printError(out, "Server error");
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
+            JSONUtils.printError(out, e.getMessage());
+        } catch (IsExistException | NotValidDataException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            JSONUtils.printError(out, e.getMessage());
+
         }
     }
-
-
-
-
 }
