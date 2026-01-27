@@ -1,6 +1,7 @@
 package currency.app.Utilites;
 
 import currency.app.DAO.ErrorDTO;
+import currency.app.Exceptions.NotValidDataException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -26,8 +27,7 @@ public class Utils {
 
         String body = requestBody.toString();
 
-        
-        
+
         Map<String, String> params = new HashMap<>();
         String[] pairs = body.split("&");
 
@@ -46,24 +46,25 @@ public class Utils {
         return params;
     }
 
-    public Map<String, String> parseQueryParams(HttpServletRequest request, HttpServletResponse response, String[] params) throws IOException {
+    public Map<String, String> parseQueryParams(HttpServletRequest request, HttpServletResponse response, String[] params) throws NotValidDataException {
         String[] queryParams = request
-            .getQueryString()
-            .split("&");
-        Map<String,String> mapParams = Arrays.stream(queryParams)
+                .getQueryString()
+                .split("&");
+        Map<String, String> mapParams = Arrays.stream(queryParams)
                 .map(string -> string.split("="))
-                .collect(Collectors.toMap((str)-> str[0], (str)-> str[1]));
+                .collect(Collectors.toMap((str) -> str[0], (str) -> str[1]));
 
 
-        for(String param : params) {
-            if(!mapParams.containsKey(param)){
+        for (String param : params) {
+            if (!mapParams.containsKey(param)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return null;
-            }        }
+                throw new NotValidDataException("expect required fields:" + param);
+            }
+        }
         return mapParams;
     }
 
-    public ErrorDTO getError(String message){
+    public ErrorDTO getError(String message) {
         return new ErrorDTO(message);
     }
 }

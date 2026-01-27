@@ -1,9 +1,11 @@
 package currency.app.servlets;
 
 import currency.app.DAO.ExchangeRatesDAO;
+import currency.app.Exceptions.IsExistException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
 import currency.app.entities.ExchangeRate;
+import currency.app.services.ExchangeService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,9 +22,9 @@ import java.util.Optional;
 
 @WebServlet("/exchangeRates/*")
 public class ExchangeRatesServlet extends HttpServlet {
-    public JSONUtils jsonUtils;
     private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
     private final Utils utils = new Utils();
+    private final ExchangeService exchangeService = new ExchangeService();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -40,32 +42,15 @@ public class ExchangeRatesServlet extends HttpServlet {
                 }
             }
 
-
+            String newExchangeRate = exchangeService.createExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
             response.setStatus(HttpServletResponse.SC_CREATED);
-
-            Optional<ExchangeRate> exchangeRate = exchangeRatesDAO.findByCodes(baseCurrencyCode, targetCurrencyCode);
-            if (exchangeRate.isPresent()) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                out.print("already exist");
-
-            } else {
-                BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
-                Optional<ExchangeRate> newExchangeRate = exchangeRatesDAO.create(baseCurrencyCode, targetCurrencyCode, rateValue);
-
-                if (newExchangeRate.isPresent()) {
-                    String currencyJsonString = JSONUtils.getSimpleJson(newExchangeRate);
-                    out.print(currencyJsonString);
-                } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                }
-            }
-
-        } catch (Exception ex) {
-            if (ex instanceof NumberFormatException) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            } else {
-                response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-            }
+            out.print(JSONUtils.getSimpleJson(newExchangeRate));
+        } catch (IsExistException ex) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            JSONUtils.printError(out, ex.getMessage());
+        } catch (RuntimeException ex) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONUtils.printError(out, ex.getMessage());
         }
     }
 
@@ -74,11 +59,12 @@ public class ExchangeRatesServlet extends HttpServlet {
             throws IOException {
         PrintWriter out = response.getWriter();
         try {
-            List<ExchangeRate> exchangeRates = exchangeRatesDAO.findAll();
-            out.print(JSONUtils.getSimpleJson(exchangeRates));
-        } catch (SQLException | NoSuchMethodException | InvocationTargetException | InstantiationException |
-                 IllegalAccessException e) {
-            throw new RuntimeException(e);
+            String exchangeRates = exchangeService.getAllExchangeRates();
+            out.print(exchangeRates);
+        } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            JSONUtils.printError(out, "Server error");
         }
 
 

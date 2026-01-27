@@ -123,8 +123,7 @@ public class DatabaseAdapter {
         }
     }
 
-    public <T> List<T> getListEntities(Class<T> clazz) throws
-            SQLException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public <T> List<T> getListEntities(Class<T> clazz) throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
 
         String query = clazz.getAnnotation(FindAllQuery.class).query();

@@ -44,6 +44,7 @@ public class CurrenciesServlet extends HttpServlet {
             String code = params.get("code");
             String sign = params.get("sign");
             String currency = currencyService.createCurrency(name, code, sign);
+            response.setStatus(HttpServletResponse.SC_CREATED);
             out.print(currency);
         } catch (IOException ex) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

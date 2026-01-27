@@ -24,8 +24,6 @@ import java.util.Optional;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
-    public JSONUtils jsonUtils;
-    private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
     private final ExchangeService exchangeService = new ExchangeService();
     private final Utils utils = new Utils();
 
@@ -50,7 +48,7 @@ public class ExchangeRateServlet extends HttpServlet {
         try {
             String[] codes = getPathData(request);
             String from = codes[0];
-            String to = codes[0];
+            String to = codes[1];
 
             String currencyJsonString = exchangeService.findByCodes(from, to);
             out.print(currencyJsonString);
@@ -83,7 +81,7 @@ public class ExchangeRateServlet extends HttpServlet {
         try {
             String[] codes = getPathData(request);
             String from = codes[0];
-            String to = codes[0];
+            String to = codes[1];
             Map<String, String> params = utils.parseFormData(request);
             String rate = params.get("rate");
             if (rate.isEmpty()) {
