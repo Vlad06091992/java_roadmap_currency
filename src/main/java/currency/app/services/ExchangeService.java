@@ -60,6 +60,13 @@ public class ExchangeService {
 
 
     public String updateExchangeRate(String from, String to, String rate) throws NotFoundException, RuntimeException {
+
+        BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
+
+        if (rateValue.compareTo(BigDecimal.ZERO) < 0) {
+            throw new NotValidDataException("Exchange rate cannot be negative. " + rateValue);
+        }
+
         Optional<ExchangeRate> exchangeRate = exchangeRatesDAO.findByCodes(from, to);
         if (exchangeRate.isPresent()) {
             //делаем update
