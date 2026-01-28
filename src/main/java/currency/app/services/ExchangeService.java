@@ -37,7 +37,7 @@ public class ExchangeService {
         } else {
             BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
 
-            if (rateValue.compareTo(BigDecimal.ZERO) < 0) {
+            if (rateValue.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new NotValidDataException("Exchange rate cannot be negative. " + rateValue);
             }
 
@@ -63,7 +63,7 @@ public class ExchangeService {
 
         BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
 
-        if (rateValue.compareTo(BigDecimal.ZERO) < 0) {
+        if (rateValue.compareTo(BigDecimal.ZERO) <= 0) {
             throw new NotValidDataException("Exchange rate cannot be negative. " + rateValue);
         }
 
@@ -88,7 +88,7 @@ public class ExchangeService {
 
         BigDecimal amountValue = BigDecimal.valueOf(Long.parseLong(amount));
 
-        if (amountValue.compareTo(BigDecimal.ZERO) < 0) {
+        if (amountValue.compareTo(BigDecimal.ZERO) <= 0) {
             throw new NotValidDataException("Amount cannot be negative. " + amountValue);
         }
 
