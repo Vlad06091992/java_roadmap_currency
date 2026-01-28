@@ -5,11 +5,9 @@ import currency.app.Exceptions.IsExistException;
 import currency.app.Exceptions.NotFoundException;
 import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
-import currency.app.Utilites.Utils;
 import currency.app.entities.Currency;
 import currency.app.entities.Exchange;
 import currency.app.entities.ExchangeRate;
-import jakarta.servlet.http.HttpServletResponse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
@@ -38,6 +36,11 @@ public class ExchangeService {
 
         } else {
             BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
+
+            if (rateValue.compareTo(BigDecimal.ZERO) < 0) {
+                throw new NotFoundException("Exchange rate cannot be negative. " + rateValue);
+            }
+
             Optional<ExchangeRate> newExchangeRate = exchangeRatesDAO.create(baseCurrencyCode, targetCurrencyCode, rateValue);
 
             if (newExchangeRate.isPresent()) {
@@ -77,6 +80,11 @@ public class ExchangeService {
          BigDecimal hundred = BigDecimal.valueOf(100);
 
         BigDecimal amountValue = BigDecimal.valueOf(Long.parseLong(amount));
+
+        if (amountValue.compareTo(BigDecimal.ZERO) < 0) {
+            throw new NotValidDataException("Amount cannot be negative. " + amountValue);
+        }
+
         Optional<ExchangeRate> exchangeRate = Optional.empty();
 
         Optional<ExchangeRate> excRate = exchangeRatesDAO.findByCodes(from, to);

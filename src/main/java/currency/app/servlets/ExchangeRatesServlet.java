@@ -2,6 +2,7 @@ package currency.app.servlets;
 
 import currency.app.DAO.ExchangeRatesDAO;
 import currency.app.Exceptions.IsExistException;
+import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
 import currency.app.entities.ExchangeRate;
@@ -45,7 +46,7 @@ public class ExchangeRatesServlet extends HttpServlet {
             String newExchangeRate = exchangeService.createExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
             response.setStatus(HttpServletResponse.SC_CREATED);
             out.print(JSONUtils.getSimpleJson(newExchangeRate));
-        } catch (IsExistException ex) {
+        } catch (IsExistException | NotValidDataException ex ) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             JSONUtils.printError(out, ex.getMessage());
         } catch (RuntimeException ex) {
