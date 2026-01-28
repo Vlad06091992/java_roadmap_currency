@@ -11,8 +11,9 @@ import java.util.*;
 public class DatabaseAdapter {
     public PreparedStatement preparedStatement(String query) throws SQLException {
         try {
-            String mode = System.getenv("mode");
             Dotenv dotenv = Dotenv.load();
+            String mode = dotenv.get("MODE");
+
 //            Dotenv dotenv = mode.equals("production") ? Dotenv.configure().directory("./").filename(".env.prod").load() : Dotenv.load();
             Class.forName("org.postgresql.Driver");
 
@@ -24,11 +25,10 @@ public class DatabaseAdapter {
             props.setProperty("user", user);
             props.setProperty("password", password);
 
-//            if (mode.equals("production")) {
-//                props.setProperty("sslmode", dotenv.get("DB_SSL_MODE"));
-//                props.setProperty("channel_binding", dotenv.get("DB_CHANNEL_BINDING"));
-//            }
-
+            if(mode.equals("production")) {
+                props.setProperty("sslmode", dotenv.get("DB_SSL_MODE"));
+                props.setProperty("channel_binding", dotenv.get("DB_CHANNEL_BINDING"));
+            }
 
             Connection connection = DriverManager.getConnection(url, props);
             return connection.prepareStatement(query);
