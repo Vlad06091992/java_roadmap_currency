@@ -38,7 +38,7 @@ public class ExchangeService {
             BigDecimal rateValue = BigDecimal.valueOf(Double.parseDouble(rate));
 
             if (rateValue.compareTo(BigDecimal.ZERO) < 0) {
-                throw new NotFoundException("Exchange rate cannot be negative. " + rateValue);
+                throw new NotValidDataException("Exchange rate cannot be negative. " + rateValue);
             }
 
             Optional<ExchangeRate> newExchangeRate = exchangeRatesDAO.create(baseCurrencyCode, targetCurrencyCode, rateValue);
