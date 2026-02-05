@@ -14,7 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class CurrencyService {
-    private final CurrencyDAO currencyDAO = new CurrencyDAO();
+    private final CurrencyDAO currencyDAO;
+
+    public CurrencyService(CurrencyDAO currencyDAO) {
+        this.currencyDAO = currencyDAO;
+    }
+
     public String getAllCurrenciesStringResponse(){
         List<Currency> currencies = currencyDAO.findAll();
         return JSONUtils.getSimpleJson(currencies);

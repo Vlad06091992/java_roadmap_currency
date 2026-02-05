@@ -4,6 +4,7 @@ import currency.app.Exceptions.IsExistException;
 import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
+import currency.app.container.AppContext;
 import currency.app.services.CurrencyService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,8 +18,8 @@ import java.util.Map;
 
 @WebServlet("/currencies")
 public class CurrenciesServlet extends HttpServlet {
-    private final Utils utils = new Utils();
-    private final CurrencyService currencyService = new CurrencyService();
+    private final Utils utils = AppContext.getInstance().getUtils();
+    private final CurrencyService currencyService = AppContext.getInstance().getCurrencyService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {

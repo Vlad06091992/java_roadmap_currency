@@ -6,6 +6,7 @@ import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
 import currency.app.DAO.ExchangeRatesDAO;
+import currency.app.container.AppContext;
 import currency.app.entities.ExchangeRate;
 import currency.app.services.CurrencyService;
 import currency.app.services.ExchangeService;
@@ -24,8 +25,8 @@ import java.util.Optional;
 
 @WebServlet("/exchangeRate/*")
 public class ExchangeRateServlet extends HttpServlet {
-    private final ExchangeService exchangeService = new ExchangeService();
-    private final Utils utils = new Utils();
+    private final ExchangeService exchangeService = AppContext.getInstance().getExchangeService();
+    private final Utils utils = AppContext.getInstance().getUtils();
 
     private String[] getPathData(HttpServletRequest request) {
         String codes = request.getPathInfo().substring(1);

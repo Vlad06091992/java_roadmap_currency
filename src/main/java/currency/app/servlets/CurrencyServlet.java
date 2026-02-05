@@ -2,6 +2,7 @@ package currency.app.servlets;
 
 import currency.app.Exceptions.NotFoundException;
 import currency.app.Utilites.JSONUtils;
+import currency.app.container.AppContext;
 import currency.app.services.CurrencyService;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,7 +14,7 @@ import java.io.PrintWriter;
 
 @WebServlet("/currency/*")
 public class CurrencyServlet extends HttpServlet {
-    private final CurrencyService currencyService = new CurrencyService();
+    private final CurrencyService currencyService = AppContext.getInstance().getCurrencyService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {

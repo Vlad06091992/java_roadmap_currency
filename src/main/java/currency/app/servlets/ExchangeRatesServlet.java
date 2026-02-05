@@ -5,6 +5,7 @@ import currency.app.Exceptions.IsExistException;
 import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
+import currency.app.container.AppContext;
 import currency.app.entities.ExchangeRate;
 import currency.app.services.ExchangeService;
 import jakarta.servlet.annotation.WebServlet;
@@ -23,9 +24,8 @@ import java.util.Optional;
 
 @WebServlet("/exchangeRates/*")
 public class ExchangeRatesServlet extends HttpServlet {
-    private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
-    private final Utils utils = new Utils();
-    private final ExchangeService exchangeService = new ExchangeService();
+    private final Utils utils = AppContext.getInstance().getUtils();
+    private final ExchangeService exchangeService = AppContext.getInstance().getExchangeService();
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException {

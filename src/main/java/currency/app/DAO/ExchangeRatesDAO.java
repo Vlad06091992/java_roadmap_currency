@@ -12,8 +12,13 @@ import java.util.Optional;
 
 
 public class ExchangeRatesDAO implements DAO<ExchangeRate> {
-    private final DatabaseAdapter dbAdapter = new DatabaseAdapter();
-    private final CurrencyDAO currencyDAO = new CurrencyDAO();
+    private final DatabaseAdapter dbAdapter;
+    private final CurrencyDAO currencyDAO;
+
+    public ExchangeRatesDAO(DatabaseAdapter dbAdapter, CurrencyDAO currencyDAO) {
+        this.dbAdapter = dbAdapter;
+        this.currencyDAO = currencyDAO;
+    }
 
 
     public Optional<ExchangeRate> findByCodes(String fromCode, String toCode) {

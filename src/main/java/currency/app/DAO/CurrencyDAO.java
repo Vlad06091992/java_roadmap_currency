@@ -9,7 +9,11 @@ import java.util.Optional;
 
 
 public class CurrencyDAO implements DAO<Currency> {
-    private final DatabaseAdapter dbAdapter = new DatabaseAdapter();
+    private final DatabaseAdapter dbAdapter;
+
+    public CurrencyDAO(DatabaseAdapter databaseAdapter) {
+        dbAdapter = databaseAdapter;
+    }
 
     public Optional<Currency> findByCode(String code) {
         try {

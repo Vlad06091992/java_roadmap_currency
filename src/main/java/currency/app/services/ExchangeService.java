@@ -17,7 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeService {
-    private final ExchangeRatesDAO exchangeRatesDAO = new ExchangeRatesDAO();
+
+    private final ExchangeRatesDAO exchangeRatesDAO;
+    public ExchangeService(ExchangeRatesDAO exchangeRatesDAO) {
+    this.exchangeRatesDAO = exchangeRatesDAO;
+    }
 
     public String findByCodes(String from, String to) throws NotFoundException {
         Optional<ExchangeRate> exchangeRate = exchangeRatesDAO.findByCodes(from, to);

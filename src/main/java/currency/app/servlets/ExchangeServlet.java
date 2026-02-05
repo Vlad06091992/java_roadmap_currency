@@ -5,6 +5,7 @@ import currency.app.Exceptions.NotValidDataException;
 import currency.app.Utilites.JSONUtils;
 import currency.app.Utilites.Utils;
 import currency.app.DAO.ExchangeRatesDAO;
+import currency.app.container.AppContext;
 import currency.app.entities.Currency;
 import currency.app.entities.Exchange;
 import currency.app.entities.ExchangeRate;
@@ -23,8 +24,8 @@ import java.util.Optional;
 
 @WebServlet("/exchange")
 public class ExchangeServlet extends HttpServlet {
-    private final ExchangeService exchangeService = new ExchangeService();
-    private final Utils utils = new Utils();
+    private final Utils utils = AppContext.getInstance().getUtils();
+    private final ExchangeService exchangeService = AppContext.getInstance().getExchangeService();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
