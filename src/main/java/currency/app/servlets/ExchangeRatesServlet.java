@@ -31,43 +31,28 @@ public class ExchangeRatesServlet extends HttpServlet {
             throws IOException {
         PrintWriter out = response.getWriter();
 
-        try {
-            Map<String, String> params = utils.parseFormData(request);
-            String baseCurrencyCode = params.get("baseCurrencyCode");
-            String targetCurrencyCode = params.get("targetCurrencyCode");
-            String rate = params.get("rate");
-            for (String param : new String[]{baseCurrencyCode, targetCurrencyCode, rate}) {
-                if (params.isEmpty() || param == null) {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-            }
 
-            String newExchangeRate = exchangeService.createExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            out.print(JSONUtils.getSimpleJson(newExchangeRate));
-        } catch (IsExistException | NotValidDataException ex ) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            JSONUtils.printError(out, ex.getMessage());
-        } catch (RuntimeException ex) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            JSONUtils.printError(out, ex.getMessage());
+        Map<String, String> params = utils.parseFormData(request);
+        String baseCurrencyCode = params.get("baseCurrencyCode");
+        String targetCurrencyCode = params.get("targetCurrencyCode");
+        String rate = params.get("rate");
+        for (String param : new String[]{baseCurrencyCode, targetCurrencyCode, rate}) {
+            if (params.isEmpty() || param == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
         }
+
+        String newExchangeRate = exchangeService.createExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
+        response.setStatus(HttpServletResponse.SC_CREATED);
+        out.print(JSONUtils.getSimpleJson(newExchangeRate));
     }
 
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         PrintWriter out = response.getWriter();
-        try {
-            String exchangeRates = exchangeService.getAllExchangeRates();
-            out.print(exchangeRates);
-        } catch (SQLException | InvocationTargetException | InstantiationException | IllegalAccessException |
-                 NoSuchMethodException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            JSONUtils.printError(out, "Server error");
-        }
-
-
+        String exchangeRates = exchangeService.getAllExchangeRates();
+        out.print(JSONUtils.getSimpleJson(exchangeRates));
     }
 }

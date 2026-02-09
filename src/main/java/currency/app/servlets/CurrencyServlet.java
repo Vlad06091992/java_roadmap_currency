@@ -19,16 +19,10 @@ public class CurrencyServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         PrintWriter out = response.getWriter();
-        try {
+
             String code = request.getPathInfo().substring(1);
             String currencyJsonString = currencyService.getCurrencyByCode(code);
             out.print(currencyJsonString);
-
-        }
-        catch (NotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            JSONUtils.printError(out, e.getMessage());
-        }
     }
 
 

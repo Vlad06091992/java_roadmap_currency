@@ -30,8 +30,6 @@ public class ExchangeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         PrintWriter out = response.getWriter();
-
-        try {
             String[] queryParams = new String[]{"from", "to", "amount"};
             Map<String, String> parsedQueryParams = utils.parseQueryParams(request, response, queryParams);
             String from = parsedQueryParams.get("from");
@@ -40,18 +38,5 @@ public class ExchangeServlet extends HttpServlet {
 
             String exchange = exchangeService.exchange(from,to,amount);
             out.print(exchange);
-
-        } catch (NotValidDataException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            JSONUtils.printError(out, e.getMessage());
-
-        } catch (NotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            JSONUtils.printError(out, e.getMessage());
-        }
-        catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("server error");
-        }
     }
 }

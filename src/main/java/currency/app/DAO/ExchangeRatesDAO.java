@@ -94,7 +94,7 @@ public class ExchangeRatesDAO implements DAO<ExchangeRate> {
     }
 
     @Override
-    public List<ExchangeRate> findAll() throws SQLException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    public List<ExchangeRate> findAll() throws SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return dbAdapter.getListEntities(ExchangeRate.class);
     }
 

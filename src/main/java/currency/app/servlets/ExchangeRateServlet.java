@@ -40,29 +40,15 @@ public class ExchangeRateServlet extends HttpServlet {
         return new String[]{from, to};
     }
 
-    ;
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         PrintWriter out = response.getWriter();
+        String[] codes = getPathData(request);
+        String from = codes[0];
+        String to = codes[1];
 
-        try {
-            String[] codes = getPathData(request);
-            String from = codes[0];
-            String to = codes[1];
-
-            String currencyJsonString = exchangeService.findByCodes(from, to);
-            out.print(currencyJsonString);
-        } catch (NotValidDataException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            JSONUtils.printError(out, e.getMessage());
-        } catch (NotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            JSONUtils.printError(out, e.getMessage());
-        } catch (RuntimeException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("server error");
-        }
+        String currencyJsonString = exchangeService.findByCodes(from, to);
+        out.print(currencyJsonString);
     }
 
     @Override
@@ -78,8 +64,6 @@ public class ExchangeRateServlet extends HttpServlet {
     protected void doPatch(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         PrintWriter out = response.getWriter();
-
-        try {
             String[] codes = getPathData(request);
             String from = codes[0];
             String to = codes[1];
@@ -90,19 +74,7 @@ public class ExchangeRateServlet extends HttpServlet {
                 return;
             }
 
-
             String currencyJsonString = exchangeService.updateExchangeRate(from, to, rate);
             out.print(currencyJsonString);
-
-        } catch (NotValidDataException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            JSONUtils.printError(out, e.getMessage());
-        } catch (NotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            JSONUtils.printError(out, e.getMessage());
-        } catch (RuntimeException ex) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            JSONUtils.printError(out, "Server error");
-        }
     }
 }
