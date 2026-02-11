@@ -1,38 +1,21 @@
 package currency.app.DAO;
 
 import currency.app.entities.annotations.*;
-import io.github.cdimascio.dotenv.Dotenv;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class DatabaseAdapter {
     public PreparedStatement preparedStatement(String query) throws SQLException {
         try {
-            Dotenv dotenv = Dotenv.load();
-            String mode = dotenv.get("MODE");
-
-//            Dotenv dotenv = mode.equals("production") ? Dotenv.configure().directory("./").filename(".env.prod").load() : Dotenv.load();
-            Class.forName("org.postgresql.Driver");
-
-            String url = dotenv.get("DB_URL");
-            String user = dotenv.get("DB_USER");
-            String password = dotenv.get("DB_PASSWORD");
-
-            Properties props = new Properties();
-            props.setProperty("user", user);
-            props.setProperty("password", password);
-
-            if(mode.equals("production")) {
-                props.setProperty("sslmode", dotenv.get("DB_SSL_MODE"));
-                props.setProperty("channel_binding", dotenv.get("DB_CHANNEL_BINDING"));
-            }
-
-            Connection connection = DriverManager.getConnection(url, props);
+            Connection connection = DataSource.getConnection();
             return connection.prepareStatement(query);
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

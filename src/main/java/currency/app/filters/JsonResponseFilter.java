@@ -43,11 +43,13 @@ public class JsonResponseFilter implements Filter {
             httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
             JSONUtils.printError(out, e.getMessage());
         } catch (ServiceException e) {
+            System.out.println("error: " +e.getMessage());
             httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             JSONUtils.printError(out, e.getMessage());
         } catch (Exception e) {
+            System.out.println("error: " +e.getMessage());
             httpResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            JSONUtils.printError(out, "Server error");
+            JSONUtils.printError(out, e.getMessage());
         }
     }
 
