@@ -18,6 +18,10 @@ public class DataSource {
         String user = dotenv.get("DB_USER");
         String password = dotenv.get("DB_PASSWORD");
         config.setJdbcUrl( url );
+//        config.setMinimumIdle(8);
+//        config.setMaxLifetime(10000);
+//        config.setMaximumPoolSize(12);
+//        config.setConnectionTimeout(7000);
         config.setDriverClassName ("org.postgresql.Driver" );
         config.setUsername( user );
         config.setPassword( password);
